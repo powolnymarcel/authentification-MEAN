@@ -56,6 +56,64 @@ apiRoutes.post('/enregistrement', function(req, res) {
 	}
 });
 
+apiRoutes.post('/login', function(req, res) {
+	Utilisateur.findOne({
+		nom: req.body.nom
+	}, function(err, utilisateur) {
+		if (err) throw err;
+
+		if (!utilisateur) {
+			res.send({success: false, msg: 'Echec login ,utilisateur non trouvé'});
+		} else {
+			// check if password matches
+			utilisateur.comparePassword(req.body.password, function (err, isMatch) {
+				if (isMatch && !err) {
+					// if user is found and password is right create a token
+					var token = jwt.encode(utilisateur, config.secret);
+					// return the information including token as JSON
+					res.json({success: true, token: 'JWT ' + token});
+				} else {
+					res.send({success: false, msg: 'Echec, mauvais password'});
+				}
+			});
+		}
+	});
+});
+
+// route protegee (GET http://localhost:8080/api/memberinfo)
+apiRoutes.get('/info-utilisateur', passport.authenticate('jwt', { session: false}), function(req, res) {
+	var token = getToken(req.headers);
+	if (token) {
+		var decoded = jwt.decode(token, config.secret);
+		Utilisateur.findOne({
+			name: decoded.name
+		}, function(err, utilisateur) {
+			if (err) throw err;
+
+			if (!utilisateur) {
+				return res.status(403).send({success: false, msg: 'echec login, pas d\'utilisateuur'});
+			} else {
+				res.json({success: true, msg: 'Beivenue dans votre zone secure ' + utilisateur.nom + '!'});
+			}
+		});
+	} else {
+		return res.status(403).send({success: false, msg: 'Pas de token.'});
+	}
+});
+
+getToken = function (headers) {
+	if (headers && headers.authorization) {
+		var parted = headers.authorization.split(' ');
+		if (parted.length === 2) {
+			return parted[1];
+		} else {
+			return null;
+		}
+	} else {
+		return null;
+	}
+};
+
 // connect the api routes under /api/*
 app.use('/api', apiRoutes);
 
