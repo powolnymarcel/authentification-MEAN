@@ -1,6 +1,3 @@
-//Tuto ici
-// https://devdactic.com/restful-api-user-authentication-1/
-
 {
   "name": "authentification-mean",
   "main": "server.js",

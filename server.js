@@ -1,3 +1,7 @@
+//Tuto ici
+// https://devdactic.com/restful-api-user-authentication-1/
+
+
 var express     = require('express');
 var app         = express();
 var bodyParser  = require('body-parser');
@@ -5,7 +9,7 @@ var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 var passport	= require('passport');
 var config      = require('./config/database'); // Recupere le fichier config BDD
-var User        = require('./app/modeles/user'); // Recupere le modele mongoose
+var Utilisateur        = require('./app/modeles/utilisateur'); // Recupere le modele mongoose
 var port        = process.env.PORT || 8080;
 var jwt         = require('jwt-simple');
 
